@@ -8,6 +8,7 @@ import {
   TrendingUp,
   Filter,
   Wallet,
+  XIcon,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ModeToggle } from "@/components/theme";
@@ -108,9 +109,12 @@ const ExpenseTracker = () => {
   // Filter expenses
   const filteredExpenses = useMemo(() => {
     return expenses.filter((expense) => {
-      const matchesCategory = !filter.category || expense.category === filter.category;
+      const matchesCategory =
+        !filter.category ||
+        filter.category === "all_categories" ||
+        expense.category === filter.category;
       const matchesType = filter.type === "all" || expense.type === filter.type;
-      const matchesMonth = !filter.month || expense.date.startsWith(filter.month);
+      const matchesMonth = !filter.month || expense.date.substring(0, 7) === filter.month;
 
       return matchesCategory && matchesType && matchesMonth;
     });
@@ -189,8 +193,8 @@ const ExpenseTracker = () => {
                   Manage your income and expenses efficiently
                 </p>
               </div>
-              <div className="flex items-center gap-4">
-                <div>
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center">
                   <Label htmlFor="currency" className="mr-2 dark:text-gray-200">
                     Currency:
                   </Label>
@@ -198,7 +202,7 @@ const ExpenseTracker = () => {
                     <SelectTrigger className="w-[130px] dark:bg-gray-700 dark:border-gray-600">
                       <SelectValue placeholder="Select currency" />
                     </SelectTrigger>
-                    <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                    <SelectContent>
                       {Object.entries(currencySymbols).map(([code, symbol]) => (
                         <SelectItem key={code} value={code}>
                           {symbol} {code}
@@ -207,7 +211,9 @@ const ExpenseTracker = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <ModeToggle />
+                <div className="ml-2">
+                  <ModeToggle />
+                </div>
               </div>
             </div>
           </CardContent>
@@ -432,16 +438,18 @@ const ExpenseTracker = () => {
                     </SelectTrigger>
                     <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
                       <SelectItem value="all_categories">All Categories</SelectItem>
-                      {categories.expense.map((cat) => (
-                        <SelectItem key={`expense-${cat}`} value={cat}>
-                          {cat}
-                        </SelectItem>
-                      ))}
-                      {categories.income.map((cat) => (
-                        <SelectItem key={`income-${cat}`} value={cat}>
-                          {cat}
-                        </SelectItem>
-                      ))}
+                      {filter.type !== "income" &&
+                        categories.expense.map((cat) => (
+                          <SelectItem key={`expense-${cat}`} value={cat}>
+                            {cat}
+                          </SelectItem>
+                        ))}
+                      {filter.type !== "expense" &&
+                        categories.income.map((cat) => (
+                          <SelectItem key={`income-${cat}`} value={cat}>
+                            {cat}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
 
@@ -450,7 +458,18 @@ const ExpenseTracker = () => {
                     value={filter.month}
                     onChange={(e) => setFilter({ ...filter, month: e.target.value })}
                     className="w-[150px] dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                    placeholder="Select month"
                   />
+                  {filter.month && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setFilter({ ...filter, month: "" })}
+                      className="ml-1"
+                    >
+                      <XIcon className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
 
                 <h2 className="text-xl font-semibold mb-4 dark:text-white">Recent Transactions</h2>
