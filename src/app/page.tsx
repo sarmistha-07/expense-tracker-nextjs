@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { PlusCircle, Trash2, Calendar, DollarSign, TrendingDown, TrendingUp, Filter, Wallet } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ModeToggle } from '@/components/theme';
 
 const currencySymbols = {
   USD: '$',
@@ -147,36 +148,39 @@ const ExpenseTracker = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Expense Tracker</h1>
-              <p className="text-gray-600">Manage your income and expenses efficiently</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Expense Tracker</h1>
+              <p className="text-gray-600 dark:text-gray-300">Manage your income and expenses efficiently</p>
             </div>
-            <div>
-              <label className="mr-2 font-medium text-gray-700">Currency:</label>
-              <select
-                value={currency}
-                onChange={e => setCurrency(e.target.value)}
-                className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                {Object.entries(currencySymbols).map(([code, symbol]) => (
-                  <option key={code} value={code}>{symbol} {code}</option>
-                ))}
-              </select>
+            <div className="flex items-center gap-4">
+              <div>
+                <label className="mr-2 font-medium text-gray-700 dark:text-gray-200">Currency:</label>
+                <select
+                  value={currency}
+                  onChange={e => setCurrency(e.target.value)}
+                  className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {Object.entries(currencySymbols).map(([code, symbol]) => (
+                    <option key={code} value={code}>{symbol} {code}</option>
+                  ))}
+                </select>
+              </div>
+              <ModeToggle />
             </div>
           </div>
         </div>
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Income</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Income</p>
                 <p className="text-2xl font-bold text-green-600">
                   {currencySymbols[currency]}{stats.totalIncome.toFixed(2)}
                 </p>
@@ -185,10 +189,10 @@ const ExpenseTracker = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Expenses</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Expenses</p>
                 <p className="text-2xl font-bold text-red-600">
                   {currencySymbols[currency]}{stats.totalExpenses.toFixed(2)}
                 </p>
@@ -197,10 +201,10 @@ const ExpenseTracker = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Balance</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Balance</p>
                 <p className={`text-2xl font-bold ${stats.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {currencySymbols[currency]}{stats.balance.toFixed(2)}
                 </p>
@@ -232,7 +236,7 @@ const ExpenseTracker = () => {
               {showForm && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
                     <select
                       value={formData.type}
                       onChange={(e) => setFormData({...formData, type: e.target.value, category: ''})}
@@ -244,15 +248,15 @@ const ExpenseTracker = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount</label>
                     <div className="flex items-center">
-                      <span className="mr-2">{currencySymbols[currency]}</span>
+                      <span className="mr-2 dark:text-white">{currencySymbols[currency]}</span>
                       <input
                         type="number"
                         step="0.01"
                         value={formData.amount}
                         onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                         placeholder="0.00"
                         required
                       />
@@ -260,23 +264,23 @@ const ExpenseTracker = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                     <input
                       type="text"
                       value={formData.description}
                       onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Enter description"
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      placeholder="Description"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                    <select
-                      value={formData.category}
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                    <select 
+                      value={formData.category} 
                       onChange={(e) => setFormData({...formData, category: e.target.value})}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                       required
                     >
                       <option value="">Select category</option>
@@ -287,12 +291,12 @@ const ExpenseTracker = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
                     <input
                       type="date"
                       value={formData.date}
                       onChange={(e) => setFormData({...formData, date: e.target.value})}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                       required
                     />
                   </div>
@@ -326,20 +330,20 @@ const ExpenseTracker = () => {
                   <span className="text-sm font-medium text-gray-700">Filters:</span>
                 </div>
 
-                <select
-                  value={filter.type}
+                <select 
+                  value={filter.type} 
                   onChange={(e) => setFilter({...filter, type: e.target.value})}
-                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 >
                   <option value="all">All Types</option>
                   <option value="income">Income</option>
                   <option value="expense">Expense</option>
                 </select>
 
-                <select
-                  value={filter.category}
+                <select 
+                  value={filter.category} 
                   onChange={(e) => setFilter({...filter, category: e.target.value})}
-                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 >
                   <option value="">All Categories</option>
                   {categories.expense.map(cat => (
@@ -354,11 +358,11 @@ const ExpenseTracker = () => {
                   type="month"
                   value={filter.month}
                   onChange={(e) => setFilter({...filter, month: e.target.value})}
-                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 />
               </div>
 
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Transactions</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Recent Transactions</h2>
 
               {filteredExpenses.length === 0 ? (
                 <Alert>
@@ -373,13 +377,13 @@ const ExpenseTracker = () => {
                     .map((expense) => (
                       <div
                         key={expense.id}
-                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                       >
                         <div className="flex items-center space-x-4">
                           <div className={`w-3 h-3 rounded-full ${expense.type === 'income' ? 'bg-green-500' : 'bg-red-500'}`}></div>
                           <div>
-                            <p className="font-medium text-gray-900">{expense.description}</p>
-                            <p className="text-sm text-gray-500">
+                            <p className="font-medium text-gray-900 dark:text-white">{expense.description}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
                               {expense.category} • {new Date(expense.date).toLocaleDateString()}
                             </p>
                           </div>
@@ -393,13 +397,13 @@ const ExpenseTracker = () => {
                           <div className="flex space-x-1">
                             <button
                               onClick={() => handleEdit(expense)}
-                              className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                              className="p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 rounded"
                             >
                               <Calendar className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => handleDelete(expense.id)}
-                              className="p-1 text-red-600 hover:bg-red-50 rounded"
+                              className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
