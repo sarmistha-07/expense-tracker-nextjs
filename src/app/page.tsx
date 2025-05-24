@@ -1,28 +1,43 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
-import { PlusCircle, Trash2, Calendar, DollarSign, TrendingDown, TrendingUp, Filter } from 'lucide-react';
+import { PlusCircle, Trash2, Calendar, DollarSign, TrendingDown, TrendingUp, Filter, Wallet } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
+const currencySymbols = {
+  USD: '$',
+  EUR: '€',
+  GBP: '£',
+  INR: '₹',
+  JPY: '¥',
+  AUD: 'A$',
+  CAD: 'C$'
+};
+
 const ExpenseTracker = () => {
-  const [expenses, setExpenses] = useState([
-    {
-      id: 1,
-      amount: 50.00,
-      description: 'Groceries',
-      category: 'Food',
-      date: '2024-01-15',
-      type: 'expense'
-    },
-    {
-      id: 2,
-      amount: 3000.00,
-      description: 'Salary',
-      category: 'Income',
-      date: '2024-01-01',
-      type: 'income'
+  const [expenses, setExpenses] = useState([]);
+  const [currency, setCurrency] = useState('USD');
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const storedExpenses = localStorage.getItem('expenses');
+    if (storedExpenses) {
+      setExpenses(JSON.parse(storedExpenses));
     }
-  ]);
-  
+    const storedCurrency = localStorage.getItem('currency');
+    if (storedCurrency) {
+      setCurrency(storedCurrency);
+    }
+  }, []);
+
+  // Save to localStorage on change
+  useEffect(() => {
+    localStorage.setItem('expenses', JSON.stringify(expenses));
+  }, [expenses]);
+
+  useEffect(() => {
+    localStorage.setItem('currency', currency);
+  }, [currency]);
+
   const [formData, setFormData] = useState({
     amount: '',
     description: '',
@@ -30,13 +45,13 @@ const ExpenseTracker = () => {
     date: new Date().toISOString().split('T')[0],
     type: 'expense'
   });
-  
+
   const [filter, setFilter] = useState({
     category: '',
     type: 'all',
     month: ''
   });
-  
+
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
@@ -50,13 +65,13 @@ const ExpenseTracker = () => {
     const totalIncome = expenses
       .filter(e => e.type === 'income')
       .reduce((sum, e) => sum + e.amount, 0);
-    
+
     const totalExpenses = expenses
       .filter(e => e.type === 'expense')
       .reduce((sum, e) => sum + e.amount, 0);
-    
+
     const balance = totalIncome - totalExpenses;
-    
+
     return { totalIncome, totalExpenses, balance };
   }, [expenses]);
 
@@ -66,7 +81,7 @@ const ExpenseTracker = () => {
       const matchesCategory = !filter.category || expense.category === filter.category;
       const matchesType = filter.type === 'all' || expense.type === filter.type;
       const matchesMonth = !filter.month || expense.date.startsWith(filter.month);
-      
+
       return matchesCategory && matchesType && matchesMonth;
     });
   }, [expenses, filter]);
@@ -99,7 +114,7 @@ const ExpenseTracker = () => {
       date: new Date().toISOString().split('T')[0],
       type: 'expense'
     });
-    
+
     setShowForm(false);
   };
 
@@ -136,8 +151,24 @@ const ExpenseTracker = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Expense Tracker</h1>
-          <p className="text-gray-600">Manage your income and expenses efficiently</p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Expense Tracker</h1>
+              <p className="text-gray-600">Manage your income and expenses efficiently</p>
+            </div>
+            <div>
+              <label className="mr-2 font-medium text-gray-700">Currency:</label>
+              <select
+                value={currency}
+                onChange={e => setCurrency(e.target.value)}
+                className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                {Object.entries(currencySymbols).map(([code, symbol]) => (
+                  <option key={code} value={code}>{symbol} {code}</option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Statistics Cards */}
@@ -146,31 +177,35 @@ const ExpenseTracker = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Income</p>
-                <p className="text-2xl font-bold text-green-600">${stats.totalIncome.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {currencySymbols[currency]}{stats.totalIncome.toFixed(2)}
+                </p>
               </div>
               <TrendingUp className="h-8 w-8 text-green-600" />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Expenses</p>
-                <p className="text-2xl font-bold text-red-600">${stats.totalExpenses.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {currencySymbols[currency]}{stats.totalExpenses.toFixed(2)}
+                </p>
               </div>
               <TrendingDown className="h-8 w-8 text-red-600" />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Balance</p>
                 <p className={`text-2xl font-bold ${stats.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  ${stats.balance.toFixed(2)}
+                  {currencySymbols[currency]}{stats.balance.toFixed(2)}
                 </p>
               </div>
-              <DollarSign className="h-8 w-8 text-blue-600" />
+              <Wallet className="h-8 w-8 text-blue-600" />
             </div>
           </div>
         </div>
@@ -210,15 +245,18 @@ const ExpenseTracker = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={formData.amount}
-                      onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="0.00"
-                      required
-                    />
+                    <div className="flex items-center">
+                      <span className="mr-2">{currencySymbols[currency]}</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={formData.amount}
+                        onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="0.00"
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -287,7 +325,7 @@ const ExpenseTracker = () => {
                   <Filter className="h-4 w-4 text-gray-500" />
                   <span className="text-sm font-medium text-gray-700">Filters:</span>
                 </div>
-                
+
                 <select
                   value={filter.type}
                   onChange={(e) => setFilter({...filter, type: e.target.value})}
@@ -321,7 +359,7 @@ const ExpenseTracker = () => {
               </div>
 
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Transactions</h2>
-              
+
               {filteredExpenses.length === 0 ? (
                 <Alert>
                   <AlertDescription>
@@ -346,12 +384,12 @@ const ExpenseTracker = () => {
                             </p>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center space-x-3">
                           <span className={`font-semibold ${expense.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                            {expense.type === 'income' ? '+' : '-'}${expense.amount.toFixed(2)}
+                            {expense.type === 'income' ? '+' : '-'}{currencySymbols[currency]}{expense.amount.toFixed(2)}
                           </span>
-                          
+
                           <div className="flex space-x-1">
                             <button
                               onClick={() => handleEdit(expense)}
